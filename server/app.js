@@ -54,8 +54,8 @@ async function startServer() {
       Query: {
         getTodos: () => database.todos,
         getUsers: () => database.users,
-        getUser: (_, { id }) => database.users.find((user) => user.id === id),
-        getTodo: (_, { id }) => database.todos.find((todo) => todo.id === id),
+        getUser: (_, { id }) => database.users.find((user) => user.id == id),
+        getTodo: (_, { id }) => database.todos.find((todo) => todo.id == id),
       },
     },
   });
