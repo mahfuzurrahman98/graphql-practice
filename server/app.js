@@ -31,7 +31,6 @@ async function startServer() {
         getUsers: [User]
         getUser(id: ID!): User
         getTodo(id: ID!): Todo
-        getUserTodos(id: ID!): [Todo]
       }
     `,
     resolvers: {
