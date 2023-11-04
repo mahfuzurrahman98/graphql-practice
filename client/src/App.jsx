@@ -13,19 +13,9 @@ function App() {
   });
 
   const [output, setOutput] = useState({});
-  // make a ref to the input field for the user id
-  // make a ref to the input field for the todo id
+
   const userIdRef = useRef();
   const todoIdRef = useRef();
-
-  // we will make 4 functions
-  // 1. get all users
-  // 2. get a single user
-  // 3. get all todos
-  // 4. get a single todo
-
-  // there will be 2 buttons for { get all users } and { get all todos }
-  // there willl be two input fields for { get a single user } and { get a single todo } with a button for each name fetch
 
   // 1. get all users
   const GET_USERS = gql`
@@ -44,15 +34,6 @@ function App() {
   `;
 
   // 2. get a single user
-  /*
-  here is the apollo graphql client interface query
-  query ExampleQuery($getUserId: ID!) {
-  getUser(id: $getUserId) {
-    id
-    name
-  }
-}
-  */
   const GET_USER = gql`
     query getUser($id: ID!) {
       getUser(id: $id) {
@@ -110,17 +91,27 @@ function App() {
   };
 
   const getUser = async () => {
+    const id = userIdRef.current.value;
+    if (!id) {
+      alert('Please enter a user id');
+      return;
+    }
     const { data } = await client.query({
       query: GET_USER,
-      variables: { id: userIdRef.current.value },
+      variables: { id },
     });
     setOutput(data);
   };
 
   const getTodo = async () => {
+    const id = todoIdRef.current.value;
+    if (!id) {
+      alert('Please enter a todo id');
+      return;
+    }
     const { data } = await client.query({
       query: GET_TODO,
-      variables: { id: todoIdRef.current.value },
+      variables: { id },
     });
     setOutput(data);
   };
@@ -133,66 +124,78 @@ function App() {
 
   return (
     <ApolloProvider client={client}>
-      <div className="p-6 max-w-lg mx-auto">
+      <div className="grid grid-cols-3 p-4 gap-4">
         {/* Input section */}
-        <div className="space-y-4">
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={getAllTodos}
-          >
-            Get all todos
-          </button>
+        <div className="col-span-3 lg:col-span-1">
+          <div className="flex flex-col gap-y-3">
+            <div>
+              <button
+                className="bg-black hover:bg-gray-700 text-white py-2 px-3 rounded w-full"
+                onClick={getAllTodos}
+              >
+                Get all todos
+              </button>
+            </div>
 
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={getAllUsers}
-          >
-            Get all users
-          </button>
+            <div>
+              <button
+                className="bg-black hover:bg-gray-700 text-white py-2 px-3 rounded w-full"
+                onClick={getAllUsers}
+              >
+                Get all users
+              </button>
+            </div>
 
-          <div className="flex space-x-4">
-            <input
-              type="text"
-              placeholder="Enter user id"
-              ref={userIdRef}
-              className="border border-gray-300 rounded-md px-3 py-2 w-40"
-            />
+            <div className="flex gap-x-2">
+              <input
+                type="text"
+                placeholder="Enter the todo id"
+                ref={todoIdRef}
+                className="border border-gray-600 rounded-md px-2 py-1 w-40 w-full"
+              />
+              <button
+                className="bg-black hover:bg-gray-700 text-white py-1 px-3 rounded w-full"
+                onClick={getTodo}
+              >
+                Get todo
+              </button>
+            </div>
+
+            <div className="flex gap-x-2">
+              <input
+                type="text"
+                placeholder="Enter the user id"
+                ref={userIdRef}
+                className="border border-gray-600 rounded-md px-2 py-1 w-40 w-full"
+              />
+              <button
+                className="bg-black hover:bg-gray-700 text-white py-1 px-3 rounded w-full"
+                onClick={getUser}
+              >
+                Get user
+              </button>
+            </div>
+
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={getUser}
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-1 px-3 rounded"
+              onClick={clearOutput}
             >
-              Get user
+              Clear
             </button>
           </div>
-
-          <div className="flex space-x-4">
-            <input
-              type="text"
-              placeholder="Enter todo id"
-              ref={todoIdRef}
-              className="border border-gray-300 rounded-md px-3 py-2 w-40"
-            />
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={getTodo}
-            >
-              Get todo
-            </button>
-          </div>
-
-          <button
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
-            onClick={clearOutput}
-          >
-            Clear
-          </button>
         </div>
 
         {/* Output section */}
-        <div className="mt-8">
-          <pre className="bg-gray-100 p-4 rounded">
-            {JSON.stringify(output, null, 2)}
-          </pre>
+        <div className="col-span-3 lg:col-span-2">
+          {Object.keys(output).length === 0 ? (
+            <div className="text-center text-2xl text-gray-500 mt-10 text-red-600">
+              No output
+            </div>
+          ) : (
+            <pre className="bg-gray-100 p-4 rounded">
+              {JSON.stringify(output, null, 2)}
+            </pre>
+          )}
         </div>
       </div>
     </ApolloProvider>
