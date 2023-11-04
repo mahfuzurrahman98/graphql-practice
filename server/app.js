@@ -14,6 +14,7 @@ async function startServer() {
         id: ID!
         title: String!
         completed: Boolean!
+        user: User!
       }
 
       type User {
@@ -22,15 +23,38 @@ async function startServer() {
         username: String!
         email: String!
         phone: String!
+        todos: [Todo]
       }
 
       type Query {
         getTodos: [Todo]
         getUsers: [User]
         getUser(id: ID!): User
+        getTodo(id: ID!): Todo
+        getUserTodos(id: ID!): [Todo]
       }
     `,
     resolvers: {
+      Todo: {
+        user: async (parent) => {
+          const user = await axios
+            .get(`https://jsonplaceholder.typicode.com/users/${parent.userId}`)
+            .then((res) => res.data)
+            .catch((err) => console.log(err));
+          return user;
+        },
+      },
+      User: {
+        todos: async (parent) => {
+          const todos = await axios
+            .get(
+              `https://jsonplaceholder.typicode.com/todos?userId=${parent.id}`
+            )
+            .then((res) => res.data)
+            .catch((err) => console.log(err));
+          return todos;
+        },
+      },
       Query: {
         getTodos: () =>
           axios
@@ -45,6 +69,16 @@ async function startServer() {
         getUser: (_, { id }) =>
           axios
             .get(`https://jsonplaceholder.typicode.com/users/${id}`)
+            .then((res) => res.data)
+            .catch((err) => console.log(err)),
+        getTodo: (_, { id }) =>
+          axios
+            .get(`https://jsonplaceholder.typicode.com/todos/${id}`)
+            .then((res) => res.data)
+            .catch((err) => console.log(err)),
+        getUserTodos: (_, { id }) =>
+          axios
+            .get(`https://jsonplaceholder.typicode.com/todos?userId=${id}`)
             .then((res) => res.data)
             .catch((err) => console.log(err)),
       },
